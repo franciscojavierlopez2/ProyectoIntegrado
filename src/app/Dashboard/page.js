@@ -41,7 +41,7 @@ const Dashboard = () => {
 
   const listSupers = supers.filter((market) =>
     market.nombre.toLowerCase().includes(supersEncontrados.toLowerCase())
-   
+
   );
 
   const ruta = "http://localhost:5000/api";
@@ -126,7 +126,7 @@ const Dashboard = () => {
     fetchProducts();
   }, []);
 
- useEffect(() => {
+  useEffect(() => {
     const fetchSupers = async () => {
       try {
         const storedUser = localStorage.getItem("user");
@@ -153,7 +153,7 @@ const Dashboard = () => {
     fetchSupers();
   }, []);
 
-  
+
 
   const handleDeleteUser = async (username) => {
     try {
@@ -247,34 +247,35 @@ const Dashboard = () => {
           <p>No se encontraron recetas</p>
         ) : (
           <div className="row">
-            {listRecetas.map((receta) => (
+            {listRecetas.slice(0, 3).map((receta) => (
               <div key={receta.idReceta} className="col-md-4 mb-4">
-                <div className="card h-100">
-                  <div className="card-body">
+                <div className="card h-100 d-flex flex-column align-items-center text-center">
+
+                  <div className="card-body d-flex flex-column align-items-center">
                     <h5 className="card-title">{receta.nombre}</h5>
                     <p className="card-text">
-                      <strong>Pasos: </strong> <br />
+                      <strong>Pasos:</strong> <br />
                       {receta.pasos.length > 100 ? receta.pasos.slice(0, 100) + "..." : receta.pasos}
                     </p>
                     <p><strong>Dificultad:</strong> {receta.dificultad}</p>
                     <p><strong>Tiempo:</strong> {receta.tiempo_elaboracion}</p>
-                    <div className="d-flex justify-content-center mt-3">
-                      <button
-                        className="btn btn-danger"
-                        onClick={() => handleDeleteReceta(receta.nombre)}
-                      >
-                        Eliminar
-                      </button>
-                    </div>
+                    <button
+                      className="btn btn-danger mt-3"
+                      onClick={() => handleDeleteReceta(receta.nombre)}
+                    >
+                      Eliminar
+                    </button>
                   </div>
                 </div>
               </div>
             ))}
           </div>
+
         )}
       </div>
       <div className="container mt-4">
         <h2 className="mb-4">Listado de todos los Usuarios</h2>
+
         <input
           type="text"
           className="form-control mb-3"
@@ -290,27 +291,31 @@ const Dashboard = () => {
         ) : (
 
           <div className="row">
-            {listUsers.map((user) => (
-              <div key={user.idUser} className="col-md-4 mb-4">
-                <div className="card h-100">
-                  <div className="card-body">
+            {listUsers.slice(0, 3).map((user) => (
+              <div key={user.idUser} className="col-md-3 mb-4">
+                <div className="card h-100 d-flex flex-column align-items-center text-center">
+                  <img
+                    src="/perfil.png"
+                    alt="Perfil"
+                    className="mt-3"
+                    style={{ width: "120px", height: "120px" }}
+                  />
+                  <div className="card-body d-flex flex-column align-items-center">
                     <h5 className="card-title">{user.nombre}</h5>
                     <p><strong>Apellidos:</strong> {user.apellidos}</p>
                     <p><strong>Username:</strong> {user.username}</p>
-                    <div className="d-flex justify-content-center mt-3">
-                      <button
-                        className="btn btn-danger"
-                        onClick={() => handleDeleteUser(user.username)}
-                      >
-                        Eliminar
-                      </button>
-                    </div>
-
+                    <button
+                      className="btn btn-danger mt-3"
+                      onClick={() => handleDeleteUser(user.username)}
+                    >
+                      Eliminar
+                    </button>
                   </div>
                 </div>
               </div>
             ))}
           </div>
+
         )}
       </div>
       <div className="container mt-4">
@@ -330,26 +335,24 @@ const Dashboard = () => {
         ) : (
 
           <div className="row">
-            {listProductos.map((pro) => (
+            {listProductos.slice(0, 3).map((pro) => (
               <div key={pro.idPro} className="col-md-4 mb-4">
-                <div className="card h-100">
-                  <div className="card-body">
+                <div className="card h-100 d-flex flex-column align-items-center text-center" style={{ width: "80%" }}>
+                  <div className="card-body d-flex flex-column align-items-center" >
                     <h5 className="card-title">{pro.nombre}</h5>
                     <p><strong>Tipo:</strong> {pro.tipo}</p>
-                    <div className="d-flex justify-content-center mt-3">
-                      <button
-                        className="btn btn-danger"
-                        onClick={() => handleDeleteProducto(pro.nombre)}
-                      >
-                        Eliminar
-                      </button>
-                    </div>
-
+                    <button
+                      className="btn btn-danger mt-3"
+                      onClick={() => handleDeleteProducto(pro.nombre)}
+                    >
+                      Eliminar
+                    </button>
                   </div>
                 </div>
               </div>
             ))}
           </div>
+
         )}
       </div>
       <div className="container mt-4">
@@ -357,7 +360,7 @@ const Dashboard = () => {
         <input
           type="text"
           className="form-control mb-3"
-          placeholder="Buscar usuarios"
+          placeholder="Buscar supermercados"
           value={supersEncontrados}
           onChange={(e) => setsupersEncontrados(e.target.value)}
           style={{ width: '200px' }}
@@ -369,26 +372,24 @@ const Dashboard = () => {
         ) : (
 
           <div className="row">
-            {listSupers.map((market) => (
+            {listSupers.slice(0, 3).map((market) => (
               <div key={market.idSuper} className="col-md-4 mb-4">
-                <div className="card h-100">
-                  <div className="card-body">
+                <div className="card h-100 d-flex flex-column align-items-center text-center">
+                  <div className="card-body d-flex flex-column align-items-center">
                     <h5 className="card-title">{market.nombre}</h5>
-                    <p><strong>Direccion:</strong> {market.direccion}</p>
-                    <div className="d-flex justify-content-center mt-3">
-                      <button
-                        className="btn btn-danger"
-                        onClick={() => handleDeleteSuper(market.nombre)}
-                      >
-                        Eliminar
-                      </button>
-                    </div>
-
+                    <p><strong>Dirección:</strong> {market.direccion}</p>
+                    <button
+                      className="btn btn-danger mt-3"
+                      onClick={() => handleDeleteSuper(market.nombre)}
+                    >
+                      Eliminar
+                    </button>
                   </div>
                 </div>
               </div>
             ))}
           </div>
+
         )}
       </div>
     </>

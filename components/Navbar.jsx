@@ -51,7 +51,7 @@ const Navbar = () => {
               <Link href="/MisRecetas" className="nav-link">Mis Recetas</Link>
             </li>
             <li className="nav-item">
-              <Link href="/Perfil" className="nav-link">Recetas</Link>
+              <Link href="/Recetas  " className="nav-link">Recetas</Link>
             </li>
             <li className="nav-item">
               <Link href="/Perfil" className="nav-link">Perfil</Link>
