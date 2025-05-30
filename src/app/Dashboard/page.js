@@ -4,14 +4,11 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import Navbar from "../../../components/Navbar.jsx";
-
 import 'bootstrap/dist/css/bootstrap.min.css';
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import Slider from "react-slick";
+import { jwtDecode } from "jwt-decode";
 
 const Dashboard = () => {
-
+  const router = useRouter();
   const [recetas, setRecetas] = useState([]);
   const [users, setUsers] = useState([]);
   const [productos, setProductos] = useState([]);
@@ -47,13 +44,45 @@ const Dashboard = () => {
   const ruta = "http://localhost:5000/api";
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      alert("Usuario no autenticado");
+      router.push("/");
+      return;
+    }
+
+    try {
+      const decoded = jwtDecode(token);
+
+      if (decoded.rol !== "admin") {
+        alert("No tienes permisos");
+        router.push("/");
+        return;
+      }
+
+      const ahora = Date.now() / 1000;
+      if (decoded.exp && decoded.exp < ahora) {
+        alert("Token expirado");
+        localStorage.removeItem("token");
+        router.push("/");
+        return;
+      }
+
+    } catch (error) {
+      console.error(error);
+      alert("Token invalido");
+      localStorage.removeItem("token");
+      router.push("/");
+      return;
+    }
+  }, [router]);
+
+  useEffect(() => {
     const fetchRecetas = async () => {
       try {
-        const storedUser = localStorage.getItem("user");
-        if (!storedUser) {
-          alert("Usuario no autenticado.");
-          return;
-        }
+        const token = localStorage.getItem("token");
+        if (!token) return;
 
         const res = await fetch(`${ruta}/recetas`);
         const data = await res.json();
@@ -75,11 +104,8 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchUsuarios = async () => {
       try {
-        const storedUser = localStorage.getItem("user");
-        if (!storedUser) {
-          alert("Usuario no autenticado");
-          return;
-        }
+        const token = localStorage.getItem("token");
+        if (!token) return;
 
         const res = await fetch(`${ruta}/usuarios`);
         const data = await res.json();
@@ -102,11 +128,9 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const storedUser = localStorage.getItem("user");
-        if (!storedUser) {
-          alert("Usuario no autenticado.");
-          return;
-        }
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
 
         const res = await fetch(`${ruta}/products`);
         const data = await res.json();
@@ -129,11 +153,8 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchSupers = async () => {
       try {
-        const storedUser = localStorage.getItem("user");
-        if (!storedUser) {
-          alert("Usuario no autenticado.");
-          return;
-        }
+        const token = localStorage.getItem("token");
+        if (!token) return;
 
         const res = await fetch(`${ruta}/supers`);
         const data = await res.json();

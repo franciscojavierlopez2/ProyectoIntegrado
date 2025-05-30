@@ -3,9 +3,10 @@ import User from '../models/User.js';
 import Role from '../models/Role.js';
 import UserRole from '../models/User_Role.js';
 import bcrypt from 'bcrypt'
-
+import jwt from 'jsonwebtoken';
 
 const router = express.Router();
+const JWT_SECRET = 't!oKen2';
 
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;
@@ -33,8 +34,17 @@ router.post('/login', async (req, res) => {
 
     const rol = userRole?.Role?.name || 'user';
 
+    const tokenData = {
+      idUser: user.idUser,
+      username: user.username,
+      rol,
+    };
+
+    const token = jwt.sign(tokenData, JWT_SECRET, { expiresIn: '1h' });
+
     return res.status(200).json({
       message: 'Login exitoso',
+      token,
       usuario: {
         id: user.idUser,
         nombre: user.nombre,

@@ -3,7 +3,7 @@ import sequelize from '../Sequelize/Sequelize.js';
 import User from './User.js';
 import Receta from './Receta.js';
 
-const UsuarioRecetaFavorita = sequelize.define('UsuarioRecetaFavorita', {
+const UserRecetaFavorita = sequelize.define('UsuarioRecetaFavorita', {
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -30,8 +30,8 @@ const UsuarioRecetaFavorita = sequelize.define('UsuarioRecetaFavorita', {
     timestamps: false
 });
 
-UsuarioRecetaFavorita.belongsTo(User, { foreignKey: 'idUser' });
-UsuarioRecetaFavorita.belongsTo(Receta, { as: 'Receta', foreignKey: 'idReceta' });
+UserRecetaFavorita.belongsTo(User, { foreignKey: 'idUser' });
+UserRecetaFavorita.belongsTo(Receta, { as: 'Receta', foreignKey: 'idReceta' });
 
 
-export default UsuarioRecetaFavorita;
+export default UserRecetaFavorita;

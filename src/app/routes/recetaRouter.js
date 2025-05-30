@@ -1,7 +1,7 @@
 import express from 'express';
 import Receta from '../models/Receta.js';
 import User from '../models/User.js';
-import UsuarioRecetaFavorita from "../models/Usuario_Receta_Favorita.js"
+import UserRecetaFavorita from "../models/User_Receta_Favorita.js"
 const router = express.Router();
 
 // Ruta para insertar una nueva receta
@@ -101,6 +101,17 @@ router.delete('/eliminar-receta/:nombre', async (req, res) => {
         message: 'Receta no encontrada',
       });
     }
+
+    const recetasFavs = await UserRecetaFavorita.findAll({
+      where: { idReceta: receta.idReceta }
+    });
+
+    if (recetasFavs.length > 0) {
+      await UserRecetaFavorita.destroy({
+        where: { idReceta: receta.idReceta }
+      });
+    }
+
     await receta.destroy();
 
     return res.status(200).json({
@@ -120,16 +131,16 @@ router.post('/recetas/favoritas', async (req, res) => {
   const { idUser, idReceta } = req.body;
 
   try {
-    const existe = await UsuarioRecetaFavorita.findOne({
+    const existe = await UserRecetaFavorita.findOne({
       where: { idUser, idReceta }
     });
 
     if (existe) {
-      await UsuarioRecetaFavorita.destroy({ where: { idUser, idReceta } });
+      await UserRecetaFavorita.destroy({ where: { idUser, idReceta } });
       return res.status(200).json({ message: 'Eliminada de favoritos', favorita: false });
     }
 
-    await UsuarioRecetaFavorita.create({ idUser, idReceta });
+    await UserRecetaFavorita.create({ idUser, idReceta });
     res.status(201).json({ message: 'Agregada a favoritas', favorita: true });
 
   } catch (error) {
@@ -144,7 +155,7 @@ router.get('/recetas/favoritas/:idUser', async (req, res) => {
   const { idUser } = req.params;
 
   try {
-    const favoritas = await UsuarioRecetaFavorita.findAll({
+    const favoritas = await UserRecetaFavorita.findAll({
       where: { idUser },
       include: [{ model: Receta, as: 'Receta' }]
     });
@@ -162,7 +173,7 @@ router.get('/recetas/favoritas/ids/:idUser', async (req, res) => {
   const { idUser } = req.params;
 
   try {
-    const favoritos = await UsuarioRecetaFavorita.findAll({
+    const favoritos = await UserRecetaFavorita.findAll({
       where: { idUser },
       attributes: ['idReceta']
     });

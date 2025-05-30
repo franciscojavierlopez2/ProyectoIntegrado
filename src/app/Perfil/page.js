@@ -58,6 +58,16 @@ const Perfil = () => {
     fetchUserInfo();
   }, []);
 
+  useEffect(() => {
+    if (message === "Usuario actualizado") {
+      const tiempo = setTimeout(() => {
+        setMessage("");
+      }, 2000);
+
+      return () => clearTimeout(tiempo);
+    }
+  }, [message]);
+
 
   const handleEdit = async (e) => {
     e.preventDefault();
@@ -88,14 +98,11 @@ const Perfil = () => {
     }
   };
 
-
-
-
   return (
     <>
       <Navbar />
-      <div className="flex justify-center min-h-screen bg-gray-100 pt-30">
-        <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
+      <div className="flex justify-center min-h-screen bg-white-100 pt-20">
+        <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md max-h-[450px]">
           <h2 className="text-2xl font-semibold mb-6 text-center">Mi Perfil</h2>
 
           {loading && <p className="text-center">Cargando..</p>}
@@ -156,7 +163,7 @@ const Perfil = () => {
                   onChange={(e) => setUsername(e.target.value)}
                 />
               </div>
-              <div className="flex justify-center space-x-2">
+              <div className="flex justify-center  gap-4">
                 <button
                   type="submit"
                   className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition"

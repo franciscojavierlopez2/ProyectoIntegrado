@@ -7,11 +7,11 @@ import Navbar from "../../../components/Navbar.jsx";
 const Recetas = () => {
     const [recetas, setRecetas] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [recetasEncontradas, setrecetasEncontradas] = useState('');
+    const [recetasEncontradas, setRecetasEncontradas] = useState('');
     const [listaFavs, setlistaFavs] = useState(false);
     const [favoritasIds, setFavoritasIds] = useState([]);
-
-
+    const [recetaSeleccionada, setRecetaSeleccionada] = useState(null);
+    const [RecetaModal, setRecetaModal] = useState(false);
 
     const listRecetas = recetas.filter((receta) =>
         receta.nombre.toLowerCase().includes(recetasEncontradas.toLowerCase())
@@ -19,8 +19,18 @@ const Recetas = () => {
 
     const ruta = "http://localhost:5000/api";
 
+    const mostrarModal = (receta) => {
+        setRecetaSeleccionada(receta);
+        setRecetaModal(true);
+    };
+
+    const ocultarModal = () => {
+        setRecetaModal(false);
+        setRecetaSeleccionada(null);
+    };
+
     useEffect(() => {
-        const fetchRecetasYFavoritas = async () => {
+        const fetchRecetas = async () => {
             setLoading(true);
             try {
                 const storedUser = localStorage.getItem("user");
@@ -30,12 +40,12 @@ const Recetas = () => {
                 }
 
                 const user = JSON.parse(storedUser);
-                const recetasEndpoint = listaFavs
+                const rutaRecetas = listaFavs
                     ? `${ruta}/recetas/favoritas/${user.idUser}`
-                    : `${ruta}/recetas`;
+                    : `${ruta}/recetas/otros/${user.username}`;
 
                 const [recetasRes, favoritasRes] = await Promise.all([
-                    fetch(recetasEndpoint),
+                    fetch(rutaRecetas),
                     fetch(`${ruta}/recetas/favoritas/ids/${user.idUser}`)
                 ]);
 
@@ -61,9 +71,8 @@ const Recetas = () => {
             }
         };
 
-        fetchRecetasYFavoritas();
+        fetchRecetas();
     }, [listaFavs]);
-
 
     const guardarFavorita = async (idReceta) => {
         const storedUser = localStorage.getItem("user");
@@ -106,7 +115,7 @@ const Recetas = () => {
                         className="form-control"
                         placeholder="Buscar recetas"
                         value={recetasEncontradas}
-                        onChange={(e) => setrecetasEncontradas(e.target.value)}
+                        onChange={(e) => setRecetasEncontradas(e.target.value)}
                         style={{ width: '200px' }}
                     />
                     <div className="form-check ms-3">
@@ -132,7 +141,7 @@ const Recetas = () => {
                     <div className="row">
                         {listRecetas.map((receta) => (
                             <div key={receta.idReceta} className="col-md-4 mb-4">
-                                <div className="card h-100">
+                                <div className="card h-100" onClick={() => mostrarModal(receta)} style={{ cursor: 'pointer' }}>
                                     <div className="card-body">
                                         <div className="d-flex justify-content-between align-items-center">
                                             <h5 className="card-title">{receta.nombre}</h5>
@@ -142,10 +151,14 @@ const Recetas = () => {
                                                     fontSize: '1.5rem',
                                                     color: favoritasIds.includes(receta.idReceta) ? 'gold' : 'gray'
                                                 }}
-                                                onClick={() => guardarFavorita(receta.idReceta)}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    guardarFavorita(receta.idReceta);
+                                                }}
                                             >
                                                 ★
                                             </span>
+
                                         </div>
                                         <p className="card-text">
                                             <strong>Pasos: </strong><br />
@@ -160,7 +173,28 @@ const Recetas = () => {
                     </div>
                 )}
             </div >
+            {RecetaModal && recetaSeleccionada && (
+                <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                    <div className="modal-dialog modal-lg modal-dialog-centered">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">{recetaSeleccionada.nombre}</h5>
+                            </div>
+                            <div className="modal-body">
+                                <p><strong>Pasos:</strong> {recetaSeleccionada.pasos}</p>
+                                <p><strong>Dificultad:</strong> {recetaSeleccionada.dificultad}</p>
+                                <p><strong>Tiempo de elaboración:</strong> {recetaSeleccionada.tiempo_elaboracion}</p>
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-dark" onClick={ocultarModal}>Cerrar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </>
+
 
     );
 };

@@ -32,6 +32,7 @@ const Login = () => {
 
         localStorage.setItem("user", JSON.stringify(data.usuario));
         localStorage.setItem("role", data.usuario.rol);
+        localStorage.setItem('token', data.token);
 
         router.push("/Inicio");
 
