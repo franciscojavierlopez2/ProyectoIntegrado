@@ -7,8 +7,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Inicio = () => {
 
-  console.log('Ancho del viewport:', window.innerWidth, 'px');
-  console.log('Alto del viewport:', window.innerHeight, 'px');
   return(
     <>
         <Navbar/>

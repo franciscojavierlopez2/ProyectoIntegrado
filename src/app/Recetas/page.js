@@ -9,7 +9,6 @@ const Recetas = () => {
     const [loading, setLoading] = useState(true);
     const [recetasEncontradas, setRecetasEncontradas] = useState('');
     const [listaFavs, setlistaFavs] = useState(false);
-    const [favoritasIds, setFavoritasIds] = useState([]);
     const [recetaSeleccionada, setRecetaSeleccionada] = useState(null);
     const [RecetaModal, setRecetaModal] = useState(false);
 
@@ -41,16 +40,12 @@ const Recetas = () => {
 
                 const user = JSON.parse(storedUser);
                 const rutaRecetas = listaFavs
-                    ? `${ruta}/recetas/favoritas/${user.idUser}`
+                    ? `${ruta}/recetas/favoritas/${user.id}`
                     : `${ruta}/recetas/otros/${user.username}`;
 
-                const [recetasRes, favoritasRes] = await Promise.all([
-                    fetch(rutaRecetas),
-                    fetch(`${ruta}/recetas/favoritas/ids/${user.idUser}`)
-                ]);
 
+                const recetasRes = await fetch(rutaRecetas);
                 const recetasData = await recetasRes.json();
-                const favoritasData = await favoritasRes.json();
 
                 if (recetasRes.ok) {
                     setRecetas(recetasData);
@@ -58,11 +53,7 @@ const Recetas = () => {
                     console.error(recetasData.message);
                 }
 
-                if (favoritasRes.ok) {
-                    setFavoritasIds(favoritasData);
-                } else {
-                    console.error(favoritasData.message);
-                }
+
 
             } catch (error) {
                 console.error(error);
@@ -87,16 +78,19 @@ const Recetas = () => {
                 body: JSON.stringify({ idUser: user.idUser || user.id, idReceta })
             });
 
-            const data = await res.json();
+             const data = await res.json();
             if (res.ok) {
-                if (data.favorita) {
-                    setFavoritasIds([...favoritasIds, idReceta]);
-                } else {
-                    setFavoritasIds(favoritasIds.filter(id => id !== idReceta));
-                }
+                setRecetas(prevRecetas =>
+                    prevRecetas.map(receta =>
+                        receta.idReceta === idReceta
+                            ? { ...receta, favorita: data.favorita ? 1 : 0 }
+                            : receta
+                    )
+                );
             } else {
                 alert(data.message);
             }
+
         } catch (error) {
             console.error(error);
         }
@@ -149,7 +143,8 @@ const Recetas = () => {
                                                 style={{
                                                     cursor: 'pointer',
                                                     fontSize: '1.5rem',
-                                                    color: favoritasIds.includes(receta.idReceta) ? 'gold' : 'gray'
+                                                    color: receta.favorita === 1 ? 'gold' : 'gray'
+
                                                 }}
                                                 onClick={(e) => {
                                                     e.stopPropagation();

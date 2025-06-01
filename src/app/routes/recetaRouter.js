@@ -137,10 +137,18 @@ router.post('/recetas/favoritas', async (req, res) => {
 
     if (existe) {
       await UserRecetaFavorita.destroy({ where: { idUser, idReceta } });
+      await Receta.update(
+        { favorita: 0 },
+        { where: { idReceta } }
+      );
       return res.status(200).json({ message: 'Eliminada de favoritos', favorita: false });
     }
 
     await UserRecetaFavorita.create({ idUser, idReceta });
+    await Receta.update(
+      { favorita: 1 },
+      { where: { idReceta } }
+    );
     res.status(201).json({ message: 'Agregada a favoritas', favorita: true });
 
   } catch (error) {

@@ -24,6 +24,11 @@ const Receta = sequelize.define('Receta', {
         type: DataTypes.STRING(10),
         allowNull: true
     },
+    favorita: {     
+        type: DataTypes.TINYINT,
+        allowNull: false,
+        defaultValue: false
+    },
     idUser: {
         type: DataTypes.INTEGER,
         allowNull: false,

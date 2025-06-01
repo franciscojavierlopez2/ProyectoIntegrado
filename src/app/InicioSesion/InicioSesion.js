@@ -145,7 +145,7 @@ const Login = () => {
         {!isRegister && (
           <div className="text-center">
             <span
-              onClick={() => router.push("/RecuperarContraseña")}
+              onClick={() => router.push("/ForgotPassword")}
               className="text-blue-600 hover:underline cursor-pointer text-sm"
             >
               ¿Olvidaste tu contraseña?

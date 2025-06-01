@@ -8,6 +8,7 @@ import proSuperRouter from "./routes/proSuperRouter.js"
 import sesionRouter from "./routes/sesionRouter.js"
 import roleRouter from "./routes/roleRouter.js"
 import recetaRouter from "./routes/recetaRouter.js"
+import forgotPassword from "./routes/forgotPassword.js"
 dotenv.config();
 
 const app = express();
@@ -21,7 +22,8 @@ app.use("/api", userRouter);
 app.use("/api", proSuperRouter);
 app.use("/api", sesionRouter);
 app.use("/api", roleRouter);
-app.use("/api", recetaRouter)
+app.use("/api", recetaRouter);
+app.use("/api", forgotPassword);
 
 // Iniciar el servidor
 const PORT = process.env.PORT || 5000;
