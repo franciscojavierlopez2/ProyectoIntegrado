@@ -2,16 +2,32 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+
+const validacionEmail = yup.object().shape({
+  email: yup
+    .string()
+    .email("Correo electrónico inválido")
+    .required("Correo obligatorio"),
+});
+
 const ForgotPassword = () => {
-  const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
   const ruta = "http://localhost:5000/api";
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
-  const handleSubmit = async () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({ resolver: yupResolver(validacionEmail) });
+
+  const handleSend = async (data) => {
     setLoading(true);
     setMessage("");
 
@@ -21,14 +37,16 @@ const ForgotPassword = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: data.email }),
       });
 
-      const data = await response.json();
+      const resdata = await response.json();
 
       if (response.ok) {
         setMessage("Si tienes un correo asociado te debería llegar un correo");
-        router.push("/");
+        setTimeout(() => {
+          router.push("/");
+        }, 2000);
       }
     } catch (error) {
       setMessage(" Error al enviar el correo");
@@ -37,28 +55,39 @@ const ForgotPassword = () => {
     }
   };
 
-  return (
+   return (
     <div className="d-flex justify-content-center align-items-center vh-100">
       <div className="card p-4" style={{ width: "350px" }}>
         <h3 className="mb-3 text-center">Recuperar contraseña</h3>
         <p className="mb-4 text-center text-muted">
           Escribe tu correo para restablecer tu contraseña
         </p>
-        <input
-          type="email"
-          className="form-control mb-3"
-          placeholder="Correo electrónico"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <button className="btn btn-primary w-100" disabled={!email}  onClick={handleSubmit}>
-          {loading ? "Enviando..." : "Enviar"}
-        </button>
-         {message && (
-          <div className="alert alert-info mt-3 text-center" role="alert">
-            {message}
-          </div>
-        )}
+
+        <form onSubmit={handleSubmit(handleSend)}>
+          <input
+            type="email"
+            placeholder="Correo electrónico"
+            className={`form-control mb-2 ${errors.email ? "is-invalid" : ""}`}
+            {...register("email")}
+          />
+          {errors.email && (
+            <div className="invalid-feedback d-block text-center">
+              {errors.email.message}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            className="btn btn-primary w-100 mt-2"
+            disabled={loading}
+          >
+            {loading ? "Enviando..." : "Enviar"}
+          </button>
+
+          {message && (
+            <div className="alert alert-info mt-3 text-center">{message}</div>
+          )}
+        </form>
       </div>
     </div>
   );

@@ -81,7 +81,7 @@ router.get('/buscar-user/:username', async (req, res) => {
 
 // Ruta para editar un usuario
 router.put('/editar-user', async (req, res) => {
-    const { username, nuevoNombre, nuevoApellidos, nuevoUsername, nuevoPassword } = req.body;
+    const { username, nuevoNombre,nuevoEmail, nuevoApellidos, nuevoUsername, nuevoPassword } = req.body;
 
     try {
         const user = await User.findOne({ where: { username } });
@@ -94,6 +94,7 @@ router.put('/editar-user', async (req, res) => {
 
         user.nombre = nuevoNombre || user.nombre;
         user.apellidos = nuevoApellidos || user.apellidos;
+        user.email=nuevoEmail || user.emaill;
         user.username = nuevoUsername || user.username;
         user.password = nuevoPassword || user.password;
 

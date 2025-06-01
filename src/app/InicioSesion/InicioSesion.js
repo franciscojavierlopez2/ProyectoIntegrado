@@ -2,89 +2,102 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
+const validacionRegistrar = yup.object().shape({
+  nombre: yup.string().required("Nombre obligatorio"),
+  apellidos: yup.string().required("Apellidos obligatorio"),
+  email: yup.string().email("Email inválido").required("Email obligatorio"),
+  username: yup.string().required("Usuario obligatorio"),
+  password: yup
+    .string()
+    .required("Contraseña obligatoria")
+    .min(6, "La contraseña debe tener al menos 6 caracteres")
+    .matches(/[A-Z]/, "La contraseña debe contener al menos una mayúscula")
+    .matches(/[\W_]/, "La contraseña debe contener al menos un carácter especial"),
+});
+
+const validacionLogin = yup.object().shape({
+  username: yup.string().required("Usuario obligatorio"),
+  password: yup.string().required("Contraseña obligatoria"),
+});
 
 const Login = () => {
   const [isRegister, setIsRegister] = useState(false);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [nombre, setNombre] = useState("");
-  const [apellidos, setApellidos] = useState("");
   const ruta = "http://localhost:5000/api";
-
   const router = useRouter();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await fetch(`${ruta}/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-      });
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(isRegister ? validacionRegistrar : validacionLogin),
+  });
 
-      const data = await res.json();
+  const handleLogin = async (data) => {
+  try {
+    const res = await fetch(`${ruta}/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: data.username, password: data.password }),
+    });
 
-      if (res.ok) {
-        alert("Sesión iniciada");
-        console.log("Usuario autenticado:", data);
+    const resdata = await res.json();
 
-        localStorage.setItem("user", JSON.stringify(data.usuario));
-        localStorage.setItem("role", data.usuario.rol);
-        localStorage.setItem('token', data.token);
+    if (res.ok) {
+      alert("Sesión iniciada");
 
-        router.push("/Inicio");
+      localStorage.setItem("user", JSON.stringify(resdata.usuario));
+      localStorage.setItem("role", resdata.usuario.rol);
+      localStorage.setItem("token", resdata.token);
 
-        setUsername("");
-        setPassword("");
-
-      } else {
-        alert(data.message);
-      }
-    } catch (error) {
-      console.error(error);
+      router.push("/Inicio");
+      reset();
+    } else {
+      alert(resdata.message);
     }
-  };
+  } catch (error) {
+    console.error(error);
+  }
+};
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await fetch(`${ruta}/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          nombre,
-          apellidos,
-          username,
-          password,
-        }),
-      });
+const handleRegister = async (data) => {
+  try {
+    const res = await fetch(`${ruta}/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        nombre: data.nombre,
+        apellidos: data.apellidos,
+        email: data.email,
+        username: data.username,
+        password: data.password,
+      }),
+    });
 
-      const data = await res.json();
+    const resdata = await res.json();
 
-      if (res.ok) {
-        alert("Registro correcto");
-        setIsRegister(false);
-
-        setUsername("");
-        setPassword("");
-        setNombre("");
-        setApellidos("");
-      } else {
-        alert(data.message);
-      }
-    } catch (error) {
-      console.error(error);
+    if (res.ok) {
+      alert("Registro correcto");
+      setIsRegister(false);
+      reset();
+    } else {
+      alert(resdata.message);
     }
-  };
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <form
-        onSubmit={isRegister ? handleRegister : handleLogin}
+         onSubmit={isRegister ? handleSubmit(handleRegister) : handleSubmit(handleLogin)}
         className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-sm space-y-6"
       >
         <h2 className="text-2xl font-semibold text-center">
@@ -96,25 +109,40 @@ const Login = () => {
             <div>
               <label className="block text-sm font-medium mb-1">Nombre</label>
               <input
+                {...register("nombre")}
                 type="text"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                required
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                 placeholder="Nombre"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               />
+              {errors.nombre && (
+                <p className="text-red-600 text-sm mt-1">{errors.nombre.message}</p>
+              )}
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">Apellidos</label>
               <input
+                {...register("apellidos")}
                 type="text"
-                value={apellidos}
-                onChange={(e) => setApellidos(e.target.value)}
-                required
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                 placeholder="Apellidos"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               />
+              {errors.apellidos && (
+                <p className="text-red-600 text-sm mt-1">{errors.apellidos.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Email</label>
+              <input
+                {...register("email")}
+                type="email"
+                placeholder="Email"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              />
+              {errors.email && (
+                <p className="text-red-600 text-sm mt-1">{errors.email.message}</p>
+              )}
             </div>
           </>
         )}
@@ -122,26 +150,29 @@ const Login = () => {
         <div>
           <label className="block text-sm font-medium mb-1">Usuario</label>
           <input
+            {...register("username")}
             type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
             placeholder="Username"
+            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
           />
+          {errors.username && (
+            <p className="text-red-600 text-sm mt-1">{errors.username.message}</p>
+          )}
         </div>
 
         <div>
           <label className="block text-sm font-medium mb-1">Contraseña</label>
           <input
+            {...register("password")}
             type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
             placeholder="Password"
+            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
           />
+          {errors.password && (
+            <p className="text-red-600 text-sm mt-1">{errors.password.message}</p>
+          )}
         </div>
+
         {!isRegister && (
           <div className="text-center">
             <span
@@ -153,7 +184,6 @@ const Login = () => {
           </div>
         )}
 
-
         <button
           type="submit"
           className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
@@ -163,7 +193,10 @@ const Login = () => {
 
         <button
           type="button"
-          onClick={() => setIsRegister(!isRegister)}
+          onClick={() => {
+            setIsRegister(!isRegister);
+            reset();
+          }}
           className="w-full text-blue-600 hover:underline mt-2 text-sm"
         >
           {isRegister
@@ -171,7 +204,7 @@ const Login = () => {
             : "¿No tienes cuenta? Regístrate"}
         </button>
       </form>
-    </div >
+    </div>
   );
 };
 

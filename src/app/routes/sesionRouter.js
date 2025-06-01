@@ -61,7 +61,7 @@ router.post('/login', async (req, res) => {
 
 // Ruta para registrar un nuevo usuario
   router.post('/register', async (req, res) => {
-    const { nombre, apellidos, username, password } = req.body;
+    const { nombre, apellidos,email, username, password } = req.body;
 
     try {
       const exist = await User.findOne({ where: { username } });
@@ -71,7 +71,7 @@ router.post('/login', async (req, res) => {
       }
 
       const hashedPassword = await bcrypt.hash(password, 5);
-      const nuevoUsuario = await User.create({ nombre, apellidos, username, password:hashedPassword });
+      const nuevoUsuario = await User.create({ nombre, apellidos,email, username, password:hashedPassword });
 
       await UserRole.create({
             idUser: nuevoUsuario.idUser, 
@@ -84,6 +84,7 @@ router.post('/login', async (req, res) => {
           id: nuevoUsuario.id,
           nombre: nuevoUsuario.nombre,
           apellidos: nuevoUsuario.apellidos,
+          email: nuevoUsuario.email,
           username: nuevoUsuario.username,
         },
       });

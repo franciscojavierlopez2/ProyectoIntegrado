@@ -49,9 +49,6 @@ router.post("/forgot-password", async (req, res) => {
             Haz clic en el siguiente enlace para continuar:<br><br>
             <a href="${resetLink}">Restablecer contraseña</a>
           </p>
-          <p style="font-size: 16px; margin-top: 20px;">
-            Si no solicitaste este correo, puedes ignorarlo.
-          </p>
         </div>
       `,
         };
