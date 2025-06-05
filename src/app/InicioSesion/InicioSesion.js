@@ -39,66 +39,70 @@ const Login = () => {
   });
 
   const handleLogin = async (data) => {
-  try {
-    const res = await fetch(`${ruta}/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username: data.username, password: data.password }),
-    });
+    try {
+      const res = await fetch(`${ruta}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: data.username, password: data.password }),
+      });
 
-    const resdata = await res.json();
+      const resdata = await res.json();
 
-    if (res.ok) {
-      alert("Sesión iniciada");
+      if (res.ok) {
+        alert("Sesión iniciada");
 
-      localStorage.setItem("user", JSON.stringify(resdata.usuario));
-      localStorage.setItem("role", resdata.usuario.rol);
-      localStorage.setItem("token", resdata.token);
+        localStorage.setItem("user", JSON.stringify(resdata.usuario));
+        localStorage.setItem("role", resdata.usuario.rol);
+        localStorage.setItem("token", resdata.token);
 
-      router.push("/Inicio");
-      reset();
-    } else {
-      alert(resdata.message);
+        router.push("/Inicio");
+        reset();
+      } else {
+        alert(resdata.message);
+      }
+    } catch (error) {
+      console.error(error);
     }
-  } catch (error) {
-    console.error(error);
-  }
-};
+  };
 
-const handleRegister = async (data) => {
-  try {
-    const res = await fetch(`${ruta}/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        nombre: data.nombre,
-        apellidos: data.apellidos,
-        email: data.email,
-        username: data.username,
-        password: data.password,
-      }),
-    });
+  const handleRegister = async (data) => {
+    try {
+      const res = await fetch(`${ruta}/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nombre: data.nombre,
+          apellidos: data.apellidos,
+          email: data.email,
+          username: data.username,
+          password: data.password,
+        }),
+      });
 
-    const resdata = await res.json();
+      const resdata = await res.json();
 
-    if (res.ok) {
-      alert("Registro correcto");
-      setIsRegister(false);
-      reset();
-    } else {
-      alert(resdata.message);
+      if (res.ok) {
+        alert("Registro correcto");
+        setIsRegister(false);
+        reset();
+      } else {
+        alert(resdata.message);
+      }
+    } catch (error) {
+      console.error(error);
     }
-  } catch (error) {
-    console.error(error);
-  }
-};
+  };
 
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div
+      className="relative flex items-center justify-center min-h-screen bg-cover bg-center bg-no-repeat"
+      style={{ backgroundImage: "url('/frutas.jpg')" }}
+    >
+
       <form
-         onSubmit={isRegister ? handleSubmit(handleRegister) : handleSubmit(handleLogin)}
-        className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-sm space-y-6"
+        onSubmit={isRegister ? handleSubmit(handleRegister) : handleSubmit(handleLogin)}
+        className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm space-y-6"
       >
         <h2 className="text-2xl font-semibold text-center">
           {isRegister ? "Registrarse" : "Iniciar Sesión"}

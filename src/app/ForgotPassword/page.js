@@ -56,7 +56,10 @@ const ForgotPassword = () => {
   };
 
    return (
-    <div className="d-flex justify-content-center align-items-center vh-100">
+    <div
+      className="relative flex items-center justify-center min-h-screen bg-cover bg-center bg-no-repeat"
+      style={{ backgroundImage: "url('/frutas.jpg')" }}
+    >
       <div className="card p-4" style={{ width: "350px" }}>
         <h3 className="mb-3 text-center">Recuperar contraseña</h3>
         <p className="mb-4 text-center text-muted">
@@ -83,6 +86,16 @@ const ForgotPassword = () => {
           >
             {loading ? "Enviando..." : "Enviar"}
           </button>
+          <br></br>
+
+          <div className="text-center">
+            <span
+               onClick={() => router.push("/")}
+              className="text-blue-600 hover:underline cursor-pointer text-lg"
+            >
+              Volver
+            </span>
+          </div>
 
           {message && (
             <div className="alert alert-info mt-3 text-center">{message}</div>

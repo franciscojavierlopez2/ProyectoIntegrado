@@ -175,7 +175,6 @@ const ProSuper = () => {
                 </button>
             </div>
 
-            {/* Formulario para insertar */}
             {vista === "insertar" && (
                 <form onSubmit={handleInsert} className="bg-white p-6 rounded shadow w-full max-w-md space-y-4">
                     <h2 className="text-xl font-bold">Asociar Producto a Supermercado</h2>
@@ -220,7 +219,6 @@ const ProSuper = () => {
                 </form>
             )}
 
-            {/* Formulario para editar */}
             {vista === "editar" && (
                 <form onSubmit={handleEditar} className="bg-white p-6 rounded shadow w-full max-w-md space-y-4">
                     <h2 className="text-xl font-bold">Editar Producto-Supermercado</h2>
@@ -265,13 +263,10 @@ const ProSuper = () => {
                 </form>
             )}
 
-            {/* Formulario para eliminar */}
-            {/* Formulario para eliminar */}
             {vista === "eliminar" && (
                 <form onSubmit={handleEliminar} className="bg-white p-6 rounded shadow w-full max-w-md space-y-4">
                     <h2 className="text-xl font-bold">Eliminar Producto-Supermercado</h2>
 
-                    {/* Campo para ingresar el nombre del Producto */}
                     <input
                         type="text"
                         placeholder="Nombre del Producto"
@@ -281,7 +276,6 @@ const ProSuper = () => {
                         className="w-full border p-2 rounded"
                     />
 
-                    {/* Campo para ingresar el nombre del Supermercado */}
                     <input
                         type="text"
                         placeholder="Nombre del Supermercado"
@@ -291,15 +285,12 @@ const ProSuper = () => {
                         className="w-full border p-2 rounded"
                     />
 
-                    {/* Botón para eliminar */}
                     <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
                         Eliminar
                     </button>
                 </form>
             )}
 
-
-            {/* Mensaje de respuesta */}
             {message && <p className="mt-6 text-center text-sm text-gray-700 font-medium">{message}</p>}
         </div>
     );

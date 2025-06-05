@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Navbar from "../../../components/Navbar.jsx";
 
 const Recetas = () => {
+    const router = useRouter();
     const [recetas, setRecetas] = useState([]);
     const [loading, setLoading] = useState(true);
     const [recetasEncontradas, setRecetasEncontradas] = useState('');
@@ -35,6 +37,7 @@ const Recetas = () => {
                 const storedUser = localStorage.getItem("user");
                 if (!storedUser) {
                     alert("Usuario no autenticado");
+                    router.push("/")
                     return;
                 }
 

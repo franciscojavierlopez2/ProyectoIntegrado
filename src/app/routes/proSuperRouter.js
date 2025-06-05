@@ -33,7 +33,7 @@ router.post('/insert-producto-super', async (req, res) => {
     const idPro = producto.idPro;
     const idSuper = supermercado.idSuper;
 
-    const existe = await ProductoSupermercado.findOne({ where: { idPro, idSuper }});
+    const existe = await ProductoSupermercado.findOne({ where: { idPro, idSuper } });
 
     if (existe) {
       return res.status(400).json({
@@ -48,13 +48,13 @@ router.post('/insert-producto-super', async (req, res) => {
     });
 
     return res.status(201).json({
-      message: 'Producto insertado correctamente en el supermercado',
+      message: 'Producto insertado en el supermercado',
       relacion: proSuper,
     });
   } catch (error) {
     console.error(error);
     return res.status(500).json({
-      message: 'Hubo un problema al insertar el producto en el supermercado',
+      message: 'No se pudo insertar el producto en el supermercado',
       error: error.message,
     });
   }
@@ -74,7 +74,7 @@ router.delete('/eliminar-producto-super', async (req, res) => {
     const idPro = producto.idPro;
     const idSuper = supermercado.idSuper;
 
-    const proSuper = await ProductoSupermercado.findOne({ where: { idPro, idSuper }});
+    const proSuper = await ProductoSupermercado.findOne({ where: { idPro, idSuper } });
 
     if (!proSuper) {
       return res.status(404).json({
@@ -85,12 +85,12 @@ router.delete('/eliminar-producto-super', async (req, res) => {
     await proSuper.destroy();
 
     return res.status(200).json({
-      message: 'Producto eliminado correctamente del supermercado',
+      message: 'Producto eliminado del supermercado',
     });
   } catch (error) {
     console.error(error);
     return res.status(500).json({
-      message: 'Hubo un error al eliminar en producto del supermercado',
+      message: 'No se pudo eliminar el producto del supermercado',
       error: error.message,
     });
   }
@@ -110,7 +110,7 @@ router.put('/editar-producto-super', async (req, res) => {
     const idPro = producto.idPro;
     const idSuper = supermercado.idSuper;
 
-    const proSuper = await ProductoSupermercado.findOne({ where: { idPro, idSuper }});
+    const proSuper = await ProductoSupermercado.findOne({ where: { idPro, idSuper } });
 
     if (!proSuper) {
       return res.status(404).json({
@@ -124,16 +124,50 @@ router.put('/editar-producto-super', async (req, res) => {
     await proSuper.save();
 
     return res.status(200).json({
-      message: 'producto actualizado correctamente para el supermercado',
+      message: 'Producto actualizado correctamente para el supermercado',
       proSuper,
     });
   } catch (error) {
     console.error(error);
     return res.status(500).json({
-      message: 'Hubo un problema al editar la producto para el supermercado.',
+      message: 'Hubo un problema al editar el producto para el supermercado.',
       error: error.message,
     });
   }
 });
+
+// Ruta obtener el producto en los distintos supermercados
+router.get('/productos-comparador/:nombreProducto', async (req, res) => {
+  const { nombreProducto } = req.params;
+
+  try {
+    const producto = await Producto.findOne({ where: { nombre: nombreProducto } });
+
+    if (!producto) {
+      return res.status(404).json({ message: 'Producto no encontrado' });
+    }
+
+    const productosSuper = await ProductoSupermercado.findAll({
+      where: { idPro: producto.idPro },
+      include: [{ model: Supermercado, attributes: ['nombre'] }],
+      order: [['precio', 'ASC']],
+    });
+
+    if (productosSuper.length === 0) {
+      return res.status(404).json({ message: 'No se ha encontrado el producto en ningun supermercado' });
+    }
+
+    return res.status(200).json({
+      productos: productosSuper,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: 'Error al buscar los productos',
+      error: error.message,
+    });
+  }
+});
+
 
 export default router;

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Navbar from "../../../components/Navbar.jsx";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -13,6 +14,7 @@ const schemaPerfil = yup.object().shape({
 });
 
 const Perfil = () => {
+  const router = useRouter();
   const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -46,7 +48,8 @@ const Perfil = () => {
 
         const storedUser = localStorage.getItem("user");
         if (!storedUser) {
-          setError("Usuario no autenticado");
+          alert("Usuario no autenticado");
+          router.push("/")
           setLoading(false);
           return;
         }
@@ -131,7 +134,7 @@ const Perfil = () => {
   return (
     <>
       <Navbar />
-      <div className="flex justify-center min-h-screen bg-white-100 pt-20">
+      <div className="flex justify-center min-h-screen bg-white-100 pt-10">
         <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md max-h-[450px]">
           <h2 className="text-2xl font-semibold mb-6 text-center">Mi Perfil</h2>
 

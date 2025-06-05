@@ -9,6 +9,7 @@ import sesionRouter from "./routes/sesionRouter.js"
 import roleRouter from "./routes/roleRouter.js"
 import recetaRouter from "./routes/recetaRouter.js"
 import forgotPassword from "./routes/forgotPassword.js"
+import witAi from "./routes/witAi.js"
 dotenv.config();
 
 const app = express();
@@ -24,6 +25,7 @@ app.use("/api", sesionRouter);
 app.use("/api", roleRouter);
 app.use("/api", recetaRouter);
 app.use("/api", forgotPassword);
+app.use("/api", witAi);
 
 // Iniciar el servidor
 const PORT = process.env.PORT || 5000;

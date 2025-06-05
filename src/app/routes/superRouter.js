@@ -1,58 +1,34 @@
 import express from 'express';
 import Supermercado from '../models/Supermercado.js';
+import ProductoSupermercado from '../models/Producto_Supermercado.js';
 const router = express.Router();
 
 // Ruta para insertar un nuevo supermercado
 router.post('/insert-super', async (req, res) => {
-    const { nombre, direccion } = req.body;
+  const { nombre, direccion } = req.body;
 
-    try {
-        const newSuper = await Supermercado.create({
-            nombre,
-            direccion,
-        });
+  try {
+    const newSuper = await Supermercado.create({
+      nombre,
+      direccion,
+    });
 
-        return res.status(201).json({
-            message: 'Supermercado creado correctamente',
-            supermercado: newSuper,
-        });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({
-            message: 'Hubo un error al crear el supermercado.',
-            error: error.message,
-        });
-    }
+    return res.status(201).json({
+      message: 'Supermercado creado correctamente',
+      supermercado: newSuper,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: 'Hubo un error al crear el supermercado.',
+      error: error.message,
+    });
+  }
 });
 
 // Ruta para buscar un supermercado
 router.get('/buscar-super/:nombre', async (req, res) => {
-    const { nombre } = req.params;
-    
-    try {
-      const supermercado = await Supermercado.findOne({ where: { nombre } });
-  
-      if (!supermercado) {
-        return res.status(404).json({
-          message: 'Supermercado no encontrado',
-        });
-      }
-  
-      return res.status(200).json({
-        supermercado,
-      });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({
-        message: 'Hubo un error al buscar el supermercado.',
-        error: error.message,
-      });
-    }
-  });
-
-  // Ruta para eliminar un supermercado por nombre
-router.delete('/eliminar-super/:nombre', async (req, res) => {
-  const { nombre } = req.params;  
+  const { nombre } = req.params;
 
   try {
     const supermercado = await Supermercado.findOne({ where: { nombre } });
@@ -62,6 +38,42 @@ router.delete('/eliminar-super/:nombre', async (req, res) => {
         message: 'Supermercado no encontrado',
       });
     }
+
+    return res.status(200).json({
+      supermercado,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: 'Hubo un error al buscar el supermercado.',
+      error: error.message,
+    });
+  }
+});
+
+// Ruta para eliminar un supermercado por nombre
+router.delete('/eliminar-super/:nombre', async (req, res) => {
+  const { nombre } = req.params;
+
+  try {
+    const supermercado = await Supermercado.findOne({ where: { nombre } });
+
+    if (!supermercado) {
+      return res.status(404).json({
+        message: 'Supermercado no encontrado',
+      });
+    }
+
+    const productosAsociados = await ProductoSupermercado.findAll({
+      where: { idSuper: supermercado.idSuper }
+    });
+
+    if (productosAsociados.length > 0) {
+      await ProductoSupermercado.destroy({
+        where: { idSuper: supermercado.idSuper }
+      });
+    }
+
     await supermercado.destroy();
 
     return res.status(200).json({
@@ -81,29 +93,29 @@ router.put('/editar-super', async (req, res) => {
   const { nombre, nuevoNombre, nuevaDirecc } = req.body;
 
   try {
-      const supermercado = await Supermercado.findOne({ where: { nombre } });
+    const supermercado = await Supermercado.findOne({ where: { nombre } });
 
-      if (!supermercado) {
-          return res.status(404).json({
-              message: 'Supermercado no encontrado',
-          });
-      }
-
-      supermercado.nombre = nuevoNombre || supermercado.nombre;
-      supermercado.direccion = nuevaDirecc || supermercado.direccion;
-
-      await supermercado.save();
-
-      return res.status(200).json({
-          message: 'Supermercado actualizado con exito',
-          product,
+    if (!supermercado) {
+      return res.status(404).json({
+        message: 'Supermercado no encontrado',
       });
+    }
+
+    supermercado.nombre = nuevoNombre || supermercado.nombre;
+    supermercado.direccion = nuevaDirecc || supermercado.direccion;
+
+    await supermercado.save();
+
+    return res.status(200).json({
+      message: 'Supermercado actualizado con exito',
+      product,
+    });
   } catch (error) {
-      console.error(error);
-      return res.status(500).json({
-          message: 'No se pudo editar el supermercado.',
-          error: error.message,
-      });
+    console.error(error);
+    return res.status(500).json({
+      message: 'No se pudo editar el supermercado.',
+      error: error.message,
+    });
   }
 });
 
@@ -119,4 +131,4 @@ router.get('/supers', async (req, res) => {
   }
 });
 
-  export default router;
+export default router;

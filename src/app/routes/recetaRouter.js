@@ -5,15 +5,34 @@ import UserRecetaFavorita from "../models/User_Receta_Favorita.js"
 const router = express.Router();
 
 // Ruta para insertar una nueva receta
-router.post('/insert-receta', async (req, res) => {
+router.post('/insert-receta/:idUser', async (req, res) => {
+  const { idUser } = req.params;
   const { nombre, pasos, tiempo_elaboracion, dificultad } = req.body;
 
+  if (!nombre) {
+    return res.status(400).json({ message: 'El nombre es obligatorio' });
+  }
+
   try {
+    const recetaExistente = await Receta.findOne({
+      where: {
+        nombre,
+        idUser,
+      }
+    });
+
+    if (recetaExistente) {
+      return res.status(409).json({
+        message: `Ya creaste una receta con ese nombre`,
+      });
+    }
+
     const newRecipe = await Receta.create({
       nombre,
       pasos,
       tiempo_elaboracion,
-      dificultad
+      dificultad,
+      idUser,
     });
 
     return res.status(201).json({
@@ -23,11 +42,11 @@ router.post('/insert-receta', async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({
-      message: 'No se pudo crear la Receta',
-      error: error.message,
+      message: 'No se pudo crear la receta',
     });
   }
 });
+
 
 router.get('/receta/usuario/:username', async (req, res) => {
   const { username } = req.params;
@@ -89,19 +108,41 @@ router.get('/recetas', async (req, res) => {
   }
 });
 
+//Ruta buscar receta concreta
+router.get('/receta-concreta/:nombre', async (req, res) => {
+  try {
+    const { nombre } = req.params;
+    const recetas = await Receta.findAll();
+
+    const recetasConNombre = recetas.filter(receta =>
+      receta.nombre.toLowerCase().includes(nombre.toLowerCase())
+    );
+
+    if (recetasConNombre.length === 0) {
+      return res.status(404).json({ message: 'No se encontraron recetas' });
+    }
+
+    res.json(recetasConNombre);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error al obtener las recetas' });
+  }
+});
+
+
+
 //Ruta eliminar recetas
-router.delete('/eliminar-receta/:nombre', async (req, res) => {
-  const { nombre } = req.params;
+router.delete('/eliminar-receta/:nombre/:idUser', async (req, res) => {
+  const { nombre, idUser } = req.params;
 
   try {
-    const receta = await Receta.findOne({ where: { nombre } });
+    const receta = await Receta.findOne({ where: { nombre, idUser } });
 
     if (!receta) {
       return res.status(404).json({
-        message: 'Receta no encontrada',
+        message: 'Receta no encontrada o no pertenece al usuario',
       });
     }
-
     const recetasFavs = await UserRecetaFavorita.findAll({
       where: { idReceta: receta.idReceta }
     });
@@ -121,10 +162,56 @@ router.delete('/eliminar-receta/:nombre', async (req, res) => {
     console.error(error);
     return res.status(500).json({
       message: 'No se pudo eliminar la receta',
-      error: error.message,
     });
   }
 });
+
+//Ruta para obtener la receta a editar
+router.get('/editar-receta/:nombre/:idUser', async (req, res) => {
+  const { nombre, idUser } = req.params;
+
+  try {
+    const receta = await Receta.findOne({ where: { nombre, idUser } });
+
+    if (!receta) {
+      return res.status(404).json({ message: 'Receta no encontrada o no pertenece al usuario' });
+    }
+
+    return res.json(receta);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: 'Error al obtener la receta para editar',
+    });
+  }
+});
+
+// Ruta para editar receta por nombre + idUser
+router.put('/editar-receta/:nombre/:idUser', async (req, res) => {
+  const { nombre, idUser } = req.params;
+  const { nuevoNombre, pasos, tiempo_elaboracion, dificultad } = req.body;
+
+  try {
+    const receta = await Receta.findOne({ where: { nombre, idUser } });
+
+    if (!receta) {
+      return res.status(404).json({ message: 'Receta no encontrada o no pertenece al usuario' });
+    }
+
+    receta.nombre = nuevoNombre ?? receta.nombre;
+    receta.pasos = pasos ?? receta.pasos;
+    receta.tiempo_elaboracion = tiempo_elaboracion ?? receta.tiempo_elaboracion;
+    receta.dificultad = dificultad ?? receta.dificultad;
+
+    await receta.save();
+
+    return res.status(200).json({ message: 'Receta actualizada', receta });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Error al editar la receta'});
+  }
+});
+
 
 // ruta para alternar receta favorita
 router.post('/recetas/favoritas', async (req, res) => {

@@ -21,6 +21,18 @@ const Dashboard = () => {
   const [usersEncontrados, setusersEncontrados] = useState('');
   const [productosEncontrados, setproductosEncontrados] = useState('');
   const [supersEncontrados, setsupersEncontrados] = useState('');
+  const [recetaSeleccionada, setRecetaSeleccionada] = useState(null);
+  const [mostrarModalReceta, setMostrarModalReceta] = useState(false);
+
+  const [userSeleccionado, setUserSeleccionado] = useState(null);
+  const [mostrarModalUser, setMostrarModalUser] = useState(false);
+
+  const [productoSeleccionado, setProductoSeleccionado] = useState(null);
+  const [mostrarModalProducto, setMostrarModalProducto] = useState(false);
+
+  const [superSeleccionado, setSuperSeleccionado] = useState(null);
+  const [mostrarModalSuper, setMostrarModalSuper] = useState(false);
+
 
   const listRecetas = recetas.filter((receta) =>
     receta.nombre.toLowerCase().includes(recetasEncontradas.toLowerCase())
@@ -28,7 +40,6 @@ const Dashboard = () => {
 
   const listUsers = users.filter((user) =>
     user.nombre.toLowerCase().includes(usersEncontrados.toLowerCase()) ||
-    user.apellidos.toLowerCase().includes(usersEncontrados.toLowerCase()) ||
     user.username.toLowerCase().includes(usersEncontrados.toLowerCase())
   );
 
@@ -248,11 +259,51 @@ const Dashboard = () => {
     }
   };
 
+  const abrirModalReceta = (receta) => {
+    setRecetaSeleccionada(receta);
+    setMostrarModalReceta(true);
+  };
+
+  const cerrarModalReceta = () => {
+    setMostrarModalReceta(false);
+    setRecetaSeleccionada(null);
+  };
+
+  const abrirModalUser = (user) => {
+    setUserSeleccionado(user);
+    setMostrarModalUser(true);
+  };
+
+  const cerrarModalUser = () => {
+    setMostrarModalUser(false);
+    setUserSeleccionado(null);
+  };
+
+  const abrirModalProducto = (producto) => {
+    setProductoSeleccionado(producto);
+    setMostrarModalProducto(true);
+  };
+
+  const cerrarModalProducto = () => {
+    setMostrarModalProducto(false);
+    setProductoSeleccionado(null);
+  };
+
+  const abrirModalSuper = (supermercado) => {
+    setSuperSeleccionado(supermercado);
+    setMostrarModalSuper(true);
+  };
+
+  const cerrarModalSuper = () => {
+    setMostrarModalSuper(false);
+    setSuperSeleccionado(null);
+  };
 
   return (
+     
     <>
       <Navbar />
-      <div className="container mt-4">
+      <div className="container mt-4 ">
         <h2 className="mb-4">Listado de todas las Recetas</h2>
         <input
           type="text"
@@ -269,9 +320,13 @@ const Dashboard = () => {
         ) : (
           <div className="row">
             {listRecetas.slice(0, 3).map((receta) => (
-              <div key={receta.idReceta} className="col-md-4 mb-4">
+              <div
+                key={receta.idReceta}
+                className="col-md-4 mb-4"
+                onClick={() => abrirModalReceta(receta)}
+                style={{ cursor: 'pointer' }}
+              >
                 <div className="card h-100 d-flex flex-column align-items-center text-center">
-
                   <div className="card-body d-flex flex-column align-items-center">
                     <h5 className="card-title">{receta.nombre}</h5>
                     <p className="card-text">
@@ -282,13 +337,17 @@ const Dashboard = () => {
                     <p><strong>Tiempo:</strong> {receta.tiempo_elaboracion}</p>
                     <button
                       className="btn btn-danger mt-3"
-                      onClick={() => handleDeleteReceta(receta.nombre)}
+                      onClick={(e) => {
+                        e.stopPropagation(); // Evita abrir el modal
+                        handleDeleteReceta(receta.nombre);
+                      }}
                     >
                       Eliminar
                     </button>
                   </div>
                 </div>
               </div>
+
             ))}
           </div>
 
@@ -313,13 +372,18 @@ const Dashboard = () => {
 
           <div className="row">
             {listUsers.slice(0, 3).map((user) => (
-              <div key={user.idUser} className="col-md-3 mb-4">
+              <div
+                key={user.idUser}
+                className="col-md-3 mb-4"
+                onClick={() => abrirModalUser(user)}
+                style={{ cursor: 'pointer' }}
+              >
                 <div className="card h-100 d-flex flex-column align-items-center text-center">
                   <img
-                    src="/perfil.png"
+                    src="/Avatar1.PNG"
                     alt="Perfil"
                     className="mt-3"
-                    style={{ width: "120px", height: "120px" }}
+                    style={{ width: "120px", height: "120px", borderRadius: "50%"}}
                   />
                   <div className="card-body d-flex flex-column align-items-center">
                     <h5 className="card-title">{user.nombre}</h5>
@@ -327,13 +391,17 @@ const Dashboard = () => {
                     <p><strong>Username:</strong> {user.username}</p>
                     <button
                       className="btn btn-danger mt-3"
-                      onClick={() => handleDeleteUser(user.username)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteUser(user.username);
+                      }}
                     >
                       Eliminar
                     </button>
                   </div>
                 </div>
               </div>
+
             ))}
           </div>
 
@@ -357,20 +425,29 @@ const Dashboard = () => {
 
           <div className="row">
             {listProductos.slice(0, 3).map((pro) => (
-              <div key={pro.idPro} className="col-md-4 mb-4">
+              <div
+                key={pro.idPro}
+                className="col-md-4 mb-4"
+                onClick={() => abrirModalProducto(pro)}
+                style={{ cursor: 'pointer' }}
+              >
                 <div className="card h-100 d-flex flex-column align-items-center text-center" style={{ width: "80%" }}>
-                  <div className="card-body d-flex flex-column align-items-center" >
+                  <div className="card-body d-flex flex-column align-items-center">
                     <h5 className="card-title">{pro.nombre}</h5>
                     <p><strong>Tipo:</strong> {pro.tipo}</p>
                     <button
                       className="btn btn-danger mt-3"
-                      onClick={() => handleDeleteProducto(pro.nombre)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteProducto(pro.nombre);
+                      }}
                     >
                       Eliminar
                     </button>
                   </div>
                 </div>
               </div>
+
             ))}
           </div>
 
@@ -394,25 +471,106 @@ const Dashboard = () => {
 
           <div className="row">
             {listSupers.slice(0, 3).map((market) => (
-              <div key={market.idSuper} className="col-md-4 mb-4">
+              <div
+                key={market.idSuper}
+                className="col-md-4 mb-4"
+                onClick={() => abrirModalSuper(market)}
+                style={{ cursor: 'pointer' }}
+              >
                 <div className="card h-100 d-flex flex-column align-items-center text-center">
                   <div className="card-body d-flex flex-column align-items-center">
                     <h5 className="card-title">{market.nombre}</h5>
                     <p><strong>Dirección:</strong> {market.direccion}</p>
+                    
                     <button
                       className="btn btn-danger mt-3"
-                      onClick={() => handleDeleteSuper(market.nombre)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteSuper(market.nombre);
+                      }}
                     >
                       Eliminar
                     </button>
                   </div>
                 </div>
               </div>
+
             ))}
           </div>
 
         )}
       </div>
+      {mostrarModalReceta && recetaSeleccionada && (
+        <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-lg modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">{recetaSeleccionada.nombre}</h5>
+              </div>
+              <div className="modal-body">
+                <p><strong>Pasos:</strong> {recetaSeleccionada.pasos}</p>
+                <p><strong>Dificultad:</strong> {recetaSeleccionada.dificultad}</p>
+                <p><strong>Tiempo:</strong> {recetaSeleccionada.tiempo_elaboracion}</p>
+              </div>
+              <div className="modal-footer">
+                <button className="btn btn-dark" onClick={cerrarModalReceta}>Cerrar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {mostrarModalUser && userSeleccionado && (
+        <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">{userSeleccionado.nombre} {userSeleccionado.apellidos}</h5>
+              </div>
+              <div className="modal-body">
+                <p><strong>Username:</strong> {userSeleccionado.username}</p>
+              </div>
+              <div className="modal-footer">
+                <button className="btn btn-dark" onClick={cerrarModalUser}>Cerrar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {mostrarModalProducto && productoSeleccionado && (
+        <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">{productoSeleccionado.nombre}</h5>
+              </div>
+              <div className="modal-body">
+                <p><strong>Tipo:</strong> {productoSeleccionado.tipo}</p>
+              </div>
+              <div className="modal-footer">
+                <button className="btn btn-dark" onClick={cerrarModalProducto}>Cerrar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {mostrarModalSuper && superSeleccionado && (
+        <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">{superSeleccionado.nombre}</h5>
+              </div>
+              <div className="modal-body">
+                <p><strong>Dirección:</strong> {superSeleccionado.direccion}</p>
+              </div>
+              <div className="modal-footer">
+                <button className="btn btn-dark" onClick={cerrarModalSuper}>Cerrar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </>
   )
 }
